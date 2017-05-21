@@ -3,53 +3,63 @@ import ReactDOM from 'react-dom';
 import {Container, Divider, Form, Header, Table} from 'semantic-ui-react'
 import 'semantic-ui-css/semantic.min.css';
 
-var players = [
-        {
-            key:'hank',
-            value:'hank',
-            flag:'hank',
-            text:'Hank'
-        },
-        {
-            key:'bill',
-            value:'bill',
-            flag:'bill',
-            text:'Bill'
-        }
-];
+const getRatingsEndpoint = '/getRatings';
+const recordMatchEndpoint = '/recordMatch';
 
-const results = [
+var players = [];
+
+// format select options like this
+var results = [
     {
-        key:'win',
-        value:'win',
-        flag:'win',
-        text:'Win'
+        text: 'Win',
+        value: 'win',
+        key: 'win',
+        flag: 'win'
     },
     {
-        key:'loss',
-        value:'loss',
-        flag:'loss',
-        text:'Loss'
+        text: 'Loss',
+        value: 'loss',
+        key: 'loss',
+        flag: 'loss'
     },
     {
-        key:'draw',
-        value:'draw',
-        flag:'draw',
-        text:'Draw'
+        text: 'Draw',
+        value: 'draw',
+        key: 'draw',
+        flag: 'draw'
     }
 ];
 
+
 class MatchReport extends React.Component {
+    constructor() {
+        super();
+        this.state = {
+            names: [],
+            playerLeft: '',
+            playerRight: '',
+            result: ''
+        };
+        this.handleSubmit = this.handleSubmit.bind(this);
+    }
+    handleChange(event) {
+        //change state to match form
+    }
+    handleSubmit(event) {
+        event.preventDefault();
+        //send to server
+    }
     render() {
         return (
-            <Form>
+            <Form onSubmit = {this.handleSubmit}>
                 <Form.Group widths='equal'>
-                    <Form.Select placeholder='Select a player' options={players}/>
-                    <Form.Select placeholder='Select a player' options={players}/>
+                    <Form.Select placeholder='Select a player' options={[/* TODO: Put players here once got from API */]}/>
+                    <Form.Select placeholder='Select a player' options={[]}/>
                 </Form.Group>
                 <Form.Field>
                     <Form.Select placeholder='Select a result' options={results}/>
                 </Form.Field>
+                <Form.Button>Record Match</Form.Button>
             </Form>
         )
     }
@@ -64,14 +74,6 @@ class Leaderboard extends React.Component {
                     <Table.HeaderCell>Name</Table.HeaderCell>
                 </Table.Header>
                 <Table.Body>
-                    <Table.Row>
-                        <Table.Cell>1000</Table.Cell>
-                        <Table.Cell>Bill</Table.Cell>
-                    </Table.Row>
-                    <Table.Row>
-                        <Table.Cell>1000</Table.Cell>
-                        <Table.Cell>Hank</Table.Cell>
-                    </Table.Row>
                 </Table.Body>
             </Table>
         )
