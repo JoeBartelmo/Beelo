@@ -3,6 +3,7 @@ The end points necessary for the backend of Deadass Beebs ranking webpage.
 @author - Hank Hang Kai Sheehan
 """
 from flask import Flask, jsonify, request, render_template
+from flask_cors import CORS
 from elopy import Implementation
 from operator import itemgetter
 import MySQLdb
@@ -14,6 +15,7 @@ db = MySQLdb.connect(host='localhost',
 cur = db.cursor()
 
 app = Flask(__name__)
+CORS(app)
 i = Implementation()
 
 def refreshDatabase(imp):
@@ -76,4 +78,4 @@ def reportMatch():
 		return jsonify({"response":"match recorded"})
 
 if __name__ == "__main__":
-	app.run(debug=True,threaded=True)
+	app.run(host='0.0.0.0',port=80,debug=True,threaded=True)
