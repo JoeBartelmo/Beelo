@@ -26,23 +26,23 @@ def refreshDatabase(imp):
         db.commit()
 
 def refreshImplementation(imp):
-        imp.players = []
-        cur.execute("SELECT * FROM elo")
-        for player in cur.fetchall():
-                imp.addPlayer(player[0],rating=player[1])
+	imp.players = []
+	cur.execute("SELECT * FROM elo")
+	for player in cur.fetchall():
+		imp.addPlayer(player[0],rating=player[1])
 
 @app.route("/")
 def index():
-        return render_template("index.html")
+	return render_template("index.html")
 
 @app.route("/getRatings")
 def getRatings():
-        refreshImplementation(i)
+	refreshImplementation(i)
         players = []
-        cur.execute("SELECT * FROM elo")
-        for player in cur.fetchall():
-                players.append({"name":player[0],"rating":player[1]})
-        players = sorted(players, key=itemgetter('rating'), reverse=True)
+	cur.execute("SELECT * FROM elo")
+	for player in cur.fetchall():
+		players.append({"name":player[0],"rating":player[1]})
+	players = sorted(players, key=itemgetter('rating'), reverse=True)
         return jsonify({"players":players})
 
 @app.route("/recordMatch", methods=['POST'])
@@ -79,3 +79,4 @@ def reportMatch():
 
 if __name__ == "__main__":
         app.run(host='0.0.0.0',port=80,debug=True,threaded=True)
+
