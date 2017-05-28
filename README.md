@@ -9,6 +9,7 @@ Install the dependencies and devDependencies and start the server:
 [NodeJS](https://nodejs.org/en/)
 ```sh
 git clone https://github.com/HankMD/Beelo.git
+sudo apt-get install python-mysqldb python-psutil python-yaml
 pip install flask
 npm i -g react-native-cli
 cd Beelo/client
