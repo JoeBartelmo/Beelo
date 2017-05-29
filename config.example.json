@@ -1,0 +1,6 @@
+{
+    "database": "mysql database to connect to",
+    "username": "username for above database",
+    "password": "password for above username"
+}
+
