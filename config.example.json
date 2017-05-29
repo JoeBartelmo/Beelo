@@ -1,7 +1,9 @@
 {
+    "notes": "BE SURE TO RENAME THIS FILE TO config.json ONCE YOU'RE DONE",
     "database": "mysql database to connect to",
     "username": "username for above database",
     "password": "password for above username",
-    "route": "domain name or ip address of the server"
+    "route": "domain name or ip address of the server",
+    "players": "./path/to/players/i/want.json"
 }
 

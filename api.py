@@ -40,11 +40,11 @@ def getPlayers():
         Obtains the generic ELO ratings for each player in the elo database.
         @return a json object listing players and their attributes
         """
-	refreshImplementation(db, root_implementation)
+	#refreshImplementation(db, root_implementation)
         players = []
 	cur.execute("SELECT * FROM elo ORDER BY rating ASC")
 	for player in cur.fetchall():
-		players.append({"name":player[0],"rating":player[1]})
+		players.append({"name":player[0],"rating":float(player[1])})
 	#players = sorted(players, key=itemgetter('rating'), reverse=True)
         return jsonify({"players":players})
 
@@ -64,7 +64,7 @@ def getDecks():
             # but TODO would be to fix this impl
             if deck.lower() not in [x.lower() for x in decks]:
                     decks.append(deck)
-    return jsonify(decks)
+    return jsonify({"decks": decks})
 
 color_cache = None
 @app.route("/getColors")
@@ -80,7 +80,7 @@ def getColors():
             for color in jsonContents:
                     color_cache.append({"colors": color, 
                         "name": jsonContents[color]})
-            color_cache = jsonify(color_cache)
+            color_cache = jsonify({"colors": color_cache})
 
     return color_cache
 
@@ -147,6 +147,9 @@ if __name__ == "__main__":
         parser.add_argument("-r", "--route", metavar = "Route",
                 type = str, help="a string associated with the ip address or"\
                         " domain name for the server this app is running on.")
+        parser.add_argument("--players", metavar = "Route",
+                type = str, help="a string associated with the path to a json"\
+                        " file that is populated with players (data/blah.json)")
 
         global args
         args = parser.parse_args()
@@ -160,6 +163,7 @@ if __name__ == "__main__":
                 args.password = jsonContents['password']
                 args.db       = jsonContents['database']
                 args.route    = jsonContents['route']
+                args.players  = jsonContents['players']
         # if there are no arguments, and there is no config file
         elif args.db is None and args.username is None and \
                 args.password is None and args.route is None: 
@@ -170,8 +174,12 @@ if __name__ == "__main__":
                              user = args.username,
                              passwd = args.password,
                              db = args.db)
-        cur = db.cursor()
         # Instantiate all the tables if they don't exist
         createTables(db)
+        # Add players if they don't already exist
+        if args.players is not None:
+            addPlayersJson(db, args.players)
+
+        cur = db.cursor()
         app.run(host='0.0.0.0',port=80,debug=True,threaded=False)
 
