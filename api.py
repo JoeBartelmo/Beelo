@@ -3,7 +3,7 @@ The end points necessary for the backend of MTG elo ranking webpage.
 @author - Hank Hang Kai Sheehan
 @author - Joe Bartelmo
 """
-from flask import Flask, jsonify, request, render_template
+from flask import Flask, redirect,jsonify, request, render_template
 from flask_cors import CORS
 from elopy import Implementation
 from operator import itemgetter
@@ -23,6 +23,7 @@ root_implementation = Implementation()
 server_configuration = './config.json'
 deck_list = './data/decks.json'
 color_list = './data/color_translations.json'
+args = None
 
 @app.route("/")
 def index():
@@ -30,7 +31,8 @@ def index():
         Simply renders the root page for the site.
         @return the rendered root html
         """
-	return render_template("index.html")
+        global args
+        return redirect('http://' + args.route + ":3000", code=302)
 
 @app.route("/getPlayers")
 def getPlayers():
@@ -40,10 +42,10 @@ def getPlayers():
         """
 	refreshImplementation(db, root_implementation)
         players = []
-	cur.execute("SELECT * FROM elo")
+	cur.execute("SELECT * FROM elo ORDER BY rating ASC")
 	for player in cur.fetchall():
 		players.append({"name":player[0],"rating":player[1]})
-	players = sorted(players, key=itemgetter('rating'), reverse=True)
+	#players = sorted(players, key=itemgetter('rating'), reverse=True)
         return jsonify({"players":players})
 
 @app.route("/getDecks")
@@ -142,20 +144,25 @@ if __name__ == "__main__":
                 type = str, help="a string associated with the password which"\
                         " is associated with the username for the MySQL local"\
                         " server")
+        parser.add_argument("-r", "--route", metavar = "Route",
+                type = str, help="a string associated with the ip address or"\
+                        " domain name for the server this app is running on.")
 
+        global args
         args = parser.parse_args()
         # If there are no arguments and the config file exists
         if args.db is None and args.username is None \
-                and args.password is None \
+                and args.password is None and args.route is None \
                 and isfile(server_configuration):
                 with open(server_configuration) as json_data:
                         jsonContents = json.load(json_data)
                 args.username = jsonContents['username']
                 args.password = jsonContents['password']
                 args.db       = jsonContents['database']
+                args.route    = jsonContents['route']
         # if there are no arguments, and there is no config file
         elif args.db is None and args.username is None and \
-                args.password is None: 
+                args.password is None and args.route is None: 
                 print 'Invalid arguments or configuration file, run with --help'
                 print 'Alternatively configure your config.json file.'
                 sys.exit(1)
@@ -166,5 +173,5 @@ if __name__ == "__main__":
         cur = db.cursor()
         # Instantiate all the tables if they don't exist
         createTables(db)
-        app.run(host='0.0.0.0',port=80,debug=True,threaded=True)
+        app.run(host='0.0.0.0',port=80,debug=True,threaded=False)
 
