@@ -1,0 +1,15 @@
+This readme is mainly for decks
+
+I've decided to categorize based on key things that i hate about mainstream
+databases for mtg.
+
+Instead of having a different category for all of the different possible decks
+(mardu control, esper control, ...) and having to populate one for each.
+
+Instead we will have a set of root architypes for all of the generic decks, and
+associate them with a color for their complete deck.
+
+So we dont list out all versions of 'midrange' instead we just store midrange
+and let the coloring in the database take care of the rest.
+
+

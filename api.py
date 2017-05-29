@@ -21,28 +21,8 @@ app = Flask(__name__)
 CORS(app)
 root_implementation = Implementation()
 server_configuration = './config.json'
-
-def refreshDatabase(imp):
-        """
-        Updates all players in the database with new elo ratings
-        @param imp - The elopy.Implementation from which to grab the players
-        """
-        for player in imp.players:
-                cur.execute("UPDATE elo "\
-                            "SET rating="+str(player.rating)+" "\
-                            "WHERE name='"+player.name+"'")
-        db.commit()
-
-def refreshImplementation(imp):
-        """
-        Grabs all players from the SQL database and puts them into the provided
-        implementation
-        @param imp - The elopy.implementation from which to refresh the players
-        """
-	imp.players = []
-	cur.execute("SELECT * FROM elo")
-	for player in cur.fetchall():
-		imp.addPlayer(player[0],rating=player[1])
+deck_list = './data/decks.json'
+color_list = './data/color_translations.json'
 
 @app.route("/")
 def index():
@@ -52,13 +32,13 @@ def index():
         """
 	return render_template("index.html")
 
-@app.route("/getRatings")
-def getRatings():
+@app.route("/getPlayers")
+def getPlayers():
         """
         Obtains the generic ELO ratings for each player in the elo database.
         @return a json object listing players and their attributes
         """
-	refreshImplementation(i)
+	refreshImplementation(db, root_implementation)
         players = []
 	cur.execute("SELECT * FROM elo")
 	for player in cur.fetchall():
@@ -66,6 +46,44 @@ def getRatings():
 	players = sorted(players, key=itemgetter('rating'), reverse=True)
         return jsonify({"players":players})
 
+@app.route("/getDecks")
+def getDecks():
+    """
+    Obtains a list of all known deck types
+    """
+    decks = []
+    cur.execute("SELECT name FROM deck")
+    for deck in cur.fetchall():
+            decks.append(deck[0])
+    with open(deck_list) as json_data:
+            jsonContents = json.load(json_data)
+    for deck in jsonContents:
+            # this is slow for sets of decks > 10000, so we don't care
+            # but TODO would be to fix this impl
+            if deck.lower() not in [x.lower() for x in decks]:
+                    decks.append(deck)
+    return jsonify(decks)
+
+color_cache = None
+@app.route("/getColors")
+def getColors():
+    """
+    Obtains a list of all color types
+    """
+    global color_cache
+    if color_cache is None:
+            color_cache = []
+            with open(color_list) as json_data:
+                    jsonContents = json.load(json_data)
+            for color in jsonContents:
+                    color_cache.append({"colors": color, 
+                        "name": jsonContents[color]})
+            color_cache = jsonify(color_cache)
+
+    return color_cache
+
+# TODO: Revamp for new ELO storage and shtuff
+#
 @app.route("/recordMatch", methods=['POST'])
 def reportMatch():
         """
@@ -78,7 +96,7 @@ def reportMatch():
         }
 
         """
-        refreshImplementation(root_implementation)
+        refreshImplementation(db, root_implementation)
         body = request.get_json()
 
         if body == None:

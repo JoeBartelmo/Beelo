@@ -2,9 +2,32 @@
 This file serves as a set of generic commands that configure the SQL Database
 and establish any needed data
 
-@author: Joe Bartelmo
+@author - Joe Bartelmo
+@author - Hank Hang Kai Sheehan
 '''
 
+
+def refreshDatabase(db, imp):
+        """
+        Updates all players in the database with new elo ratings
+        @param imp - The elopy.Implementation from which to grab the players
+        """
+        for player in imp.players:
+                db.cursor().execute("UPDATE elo "\
+                            "SET rating="+str(player.rating)+" "\
+                            "WHERE name='"+player.name+"'")
+        db.commit()
+
+def refreshImplementation(db, imp):
+        """
+        Grabs all players from the SQL database and puts them into the provided
+        implementation
+        @param imp - The elopy.implementation from which to refresh the players
+        """
+	imp.players = []
+	db.cursor().execute("SELECT * FROM elo")
+	for player in db.cursor().fetchall():
+		imp.addPlayer(player[0],rating=player[1])
 
 def createTables(db):
     '''
@@ -41,5 +64,13 @@ def createTables(db):
             ")"))
 
     db.commit()
-    
+
+def addPlayer(db, name):
+    '''
+    Adds a given player into the elo database
+    '''
+    db.cursor().execute('INSERT INTO elo VALUES (' + name +', 1000.0)')
+    db.commit()
+
+
 
