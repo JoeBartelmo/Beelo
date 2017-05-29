@@ -12,6 +12,7 @@ import json
 import sys
 import argparse
 from os.path import isfile
+from sqlManager import *
 
 '''
 Instantiate flask, CORS, and elopy Implementation
