@@ -74,12 +74,11 @@ def getColors():
     """
     global color_cache
     if color_cache is None:
-            color_cache = []
+            color_cache = {}
             with open(color_list) as json_data:
                     jsonContents = json.load(json_data)
             for color in jsonContents:
-                    color_cache.append({"colors": color, 
-                        "name": jsonContents[color]})
+                    color_cache[color] = jsonContents[color]
             color_cache = jsonify({"colors": color_cache})
 
     return color_cache
