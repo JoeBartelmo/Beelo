@@ -12,6 +12,7 @@ def refreshDatabase(db, imp):
         Updates all players in the database with new elo ratings
         @param imp - The elopy.Implementation from which to grab the players
         """
+        print 'refreshing database'
         for player in imp.players:
                 db.cursor().execute("UPDATE elo "\
                             "SET rating="+str(player.rating)+" "\
@@ -24,9 +25,12 @@ def refreshImplementation(db, imp):
         implementation
         @param imp - The elopy.implementation from which to refresh the players
         """
+        print 'refreshing elopy'
+        cursor = db.cursor()
         imp.players = []
-        db.cursor().execute("SELECT * FROM elo")
-        for player in db.cursor().fetchall():
+        cursor.execute("SELECT * FROM elo")
+
+        for player in cursor.fetchall():
                 imp.addPlayer(player[0],rating=player[1])
 
 def createTables(db):
@@ -78,6 +82,20 @@ def addPlayer(db, name, elo = 1000.0, holdCommit = False):
 
         if not holdCommit:
             db.commit()
+
+def getPlayer(db, name):
+        '''
+        Get individual player from the database
+        @param db: database to fetch player
+        @param name: name of the player
+        '''
+        db.cursor().execute('SELECT * FROM elo WHERE name=\'' + name +'\';')
+        players = []
+	for player in cur.fetchall():
+		players.append({"name":player[0],"rating":float(player[1])})
+        if len(players) == 1:
+            return players[0]
+        return None
 
 def addPlayersJson(db, jsonFile):
         '''

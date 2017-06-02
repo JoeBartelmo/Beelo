@@ -48,6 +48,18 @@ def getPlayers():
 	#players = sorted(players, key=itemgetter('rating'), reverse=True)
         return jsonify({"players":players})
 
+@app.route("/getPlayer")
+def getPlayer(player = None):
+        """
+        Obtains the generic ELO ratings for one player in the elo database.
+        @return a json object list of one player and their attributes
+        """
+	#refreshImplementation(db, root_implementation)
+        players = []
+        if player is None:
+            player = request.args.get('name')
+        return jsonify({"player":getPlayer(db, player)})
+
 @app.route("/getDecks")
 def getDecks():
     """
@@ -83,8 +95,6 @@ def getColors():
 
     return color_cache
 
-# TODO: Revamp for new ELO storage and shtuff
-#
 @app.route("/recordMatch", methods=['POST'])
 def reportMatch():
         """
@@ -97,36 +107,25 @@ def reportMatch():
         }
 
         """
-        refreshImplementation(db, root_implementation)
         body = request.get_json()
+        refreshImplementation(db, root_implementation)
 
-        if body == None:
+        winner = body['winner']
+        player1 = body['player1']
+        player2 = body['player2']
 
-                winner = request.form.getlist('winner')[0]
-                player1 = request.form.getlist('player1')[0]
-                player2 = request.form.getlist('player2')[0]
+        if winner == "draw":
+                print "draw"
+                root_implementation.recordMatch(player1,player2,draw=True)
+        elif winner == "player1":
+                print "player 1 won"
+                root_implementation.recordMatch(player1,player2,winner=player1)
+        elif winner == "player2":
+                print "player 2 won"
+                root_implementation.recordMatch(player1,player2,winner=player2)
 
-                if winner == "draw":
-                        print "draw"
-                        i.recordMatch(player1,player2,draw=True)
-                elif winner == "player1":
-                        print 1
-                        i.recordMatch(player1,player2,winner=player1)
-                elif winner == "player2":
-                        print 2
-                        i.recordMatch(player1,player2,winner=player2)
-
-                refreshDatabase(i)
-                return jsonify({"response":"match recorded"})
-        else:
-                if body["draw"] == True:
-                        i.recordMatch(body["player1"],body["player2"],draw=True)
-                else:
-                        i.recordMatch(body["player1"],body["player2"],
-                                winner=body["winner"])
-
-                refreshDatabase(i)
-                return jsonify({"response":"match recorded"})
+        refreshDatabase(db,root_implementation)
+        return jsonify({"response":"match recorded"})
 
 if __name__ == "__main__":
         parser = argparse.ArgumentParser(description = "This file [api.py] is"\

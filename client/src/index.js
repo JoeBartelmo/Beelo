@@ -8,22 +8,22 @@ import 'semantic-ui-css/semantic.min.css';
 import 'react-select/dist/react-select.css';
 import {Container, Divider, Header, Table, Form} from 'semantic-ui-react'
 
-const GET_COLORS   = 'http://' + os.hostname() + '/getColors';
+//const GET_COLORS   = 'http://' + os.hostname() + '/getColors';
 const GET_DECKS    = 'http://' + os.hostname() + '/getDecks';
 const GET_PLAYERS  = 'http://' + os.hostname() + '/getPlayers';
 const POST_MATCH   = 'http://' + os.hostname() + '/recordMatch';
 
-const VALID_COLORS = 'rgbuw';
+//const VALID_COLORS = 'rgbuw';
 
 // format select options like this
 const results = [
     {
         label: 'Win',
-        value: 'win'
+        value: 'player1'
     },
     {
         label: 'Loss',
-        value: 'loss'
+        value: 'player2'
     },
     {
         label: 'Draw',
@@ -60,10 +60,11 @@ const colors = [
  * @param val value to convert
  * @return object
  */
-function mapToOption(val) {
+function mapToOption(val, tag) {
     return {
         label: val,
-        value: val
+        value: val,
+        tag: tag
     }
 }
 
@@ -75,12 +76,13 @@ function mapToOption(val) {
  * @param str string to convert
  * @return string
  */
-function toTitleCase(str) {
-    return str.replace(/\w\S*/g, function(txt){
-        return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
-    });
-}
+//function toTitleCase(str) {
+//    return str.replace(/\w\S*/g, function(txt){
+//        return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+//    });
+//}
 
+/*
 function isValidColor(str) {
     for (let i = 0; i < str.length; i++) {
         if (!VALID_COLORS.includes(str.charAt(i))) {
@@ -103,7 +105,7 @@ function toColors(formalColor, objectMap) {
         return toTitleCase(formalColor);
     }
     return null;
-}
+}*/
 
 /**
  * All asynchronous loaded items
@@ -115,7 +117,7 @@ const getPlayers = () => {
     }
     else {
         return axios.get(GET_PLAYERS).then(response => {
-            players = {options: response.data.players.map(player => mapToOption(player.name))};
+            players = {options: response.data.players.map(player => mapToOption(player.name, player.rating))};
             return players;
         });
     }
@@ -154,9 +156,19 @@ class MatchReport extends React.Component {
         //change state to match form
     }
     handleSubmit(event) {
-        event.preventDefault();
-        console.log('testing this ish')
-        //send to server
+        var payload = {
+            winner: this.state.result.value,
+            player1: this.state.player1.value,
+            player2: this.state.player2.value
+        };
+        console.log('post request:', payload);
+        return axios.post(POST_MATCH, payload)
+        .then(function (response) {
+            console.log(response);
+        })
+        .catch(function (error) {
+            console.log(error);
+        });
     }
     selectPlayer(p, value) {
         if(p === 1)
@@ -182,7 +194,7 @@ class MatchReport extends React.Component {
     }
     render() {
         return (
-            <div id = 'match'>
+            <div id='match'>
                 <Table definition>
                     <Table.Header>
                         <Table.HeaderCell>Description</Table.HeaderCell>
@@ -262,6 +274,29 @@ class MatchReport extends React.Component {
 }
 
 class Leaderboard extends React.Component {
+
+    constructor() {
+        super();
+        this.state = {
+            players: []
+        }
+    }
+
+    componentDidMount() {
+        getPlayers().then((result) => {
+            for (let i = 0; i < result.options.length; i++) {
+                result.options[i] = (
+                    <Table.Row>
+                        <Table.Cell>{result.options[i].value}</Table.Cell>
+                        <Table.Cell>{result.options[i].tag}</Table.Cell>
+                    </Table.Row>);
+            }
+
+            this.setState({
+                players: result.options
+            });
+        });
+    }
     render() {
         return (
             <Table celled padded>
@@ -270,6 +305,7 @@ class Leaderboard extends React.Component {
                     <Table.HeaderCell>Name</Table.HeaderCell>
                 </Table.Header>
                 <Table.Body>
+                    {this.state.players}
                 </Table.Body>
             </Table>
         )
