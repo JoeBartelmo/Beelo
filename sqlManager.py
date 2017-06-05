@@ -6,6 +6,7 @@ and establish any needed data
 @author - Hank Hang Kai Sheehan
 '''
 import json
+import time
 
 def refreshDatabase(db, imp):
         """
@@ -46,25 +47,26 @@ def createTables(db):
                 "PRIMARY KEY (name))"))
 
         db.cursor().execute(("CREATE TABLE IF NOT EXISTS deck (" 
-                "id varchar(255),"
                 "name varchar(512) NOT NULL,"
                 "colors varchar(5) NOT NULL,"
-                "PRIMARY KEY (id),"
                 "CONSTRAINT full_deck UNIQUE (name,colors))"))
 
         db.cursor().execute(("CREATE TABLE IF NOT EXISTS game ("
-                "id varchar(255),"
                 "player1 varchar(255) NOT NULL,"
                 "player2 varchar(255) NOT NULL,"
                 "deck1 varchar(255) NOT NULL,"
+                "colors1 varchar(5) NOT NULL,"
                 "deck2 varchar(255) NOT NULL,"
-                "player1_wins int NOT NULL,"
-                "player2_wins int NOT NULL,"
-                "PRIMARY KEY (id),"
+                "colors2 varchar(5) NOT NULL,"
+                "winner varchar(255) NOT NULL,"
+                "stamp datetime NOT NULL,"
                 "FOREIGN KEY (player1) REFERENCES elo(name),"
                 "FOREIGN KEY (player2) REFERENCES elo(name),"
-                "FOREIGN KEY (deck1) REFERENCES deck(id),"
-                "FOREIGN KEY (deck2) REFERENCES deck(id)"
+                "FOREIGN KEY (deck1, colors1) REFERENCES deck(name, colors),"
+                "FOREIGN KEY (deck2, colors2) REFERENCES deck(name, colors),"
+                "CONSTRAINT check_winner CHECK "
+                    "(winner=player1.name OR winner=player2.name OR "
+                    "winner='draw')"
                 ")"))
 
         db.commit()
@@ -77,8 +79,9 @@ def addPlayer(db, name, elo = 1000.0, holdCommit = False):
         @param elo: current elo rating for the player
         @param holdCommit: forces to not commit to database if True
         '''
-        db.cursor().execute(('INSERT IGNORE INTO elo VALUES' 
-                '(\'' + name +'\',' + str(elo) + ')'))
+        if name is not None and elo is not None:
+            db.cursor().execute(('INSERT IGNORE INTO elo VALUES' 
+                    '(\'' + name +'\',' + str(elo) + ')'))
 
         if not holdCommit:
             db.commit()
@@ -109,4 +112,34 @@ def addPlayersJson(db, jsonFile):
         for player in jsonContents:
                 addPlayer(db, player['name'], player['rating'], True)
         db.commit()
+
+def addDeck(db, name, colors):
+    '''
+    Insert a new deck into the database if it does not already exist
+    @param db: database to add the deck
+    @param name: name of the deck
+    '''
+    if name is not None and colors is not None:
+        db.cursor().execute(('INSERT IGNORE INTO deck VALUES ('
+            "'" + name.lower() + "',"
+            "'" + colors.lower() + "');"))
+        db.commit()
+
+def addGame(db, p1, p2, d1, d2, c1, c2, winner):
+    cursor = db.cursor()
+    if p1 is not None and p2 is not None and d1 is not None and d2 is not None:
+        print 'executing'
+        sqlString = ('INSERT INTO game VALUES ('
+            "'" + p1 + "',"
+            "'" + p2 + "',"
+            "'" + d1.lower() + "',"
+            "'" + c1.lower() + "',"
+            "'" + d2.lower() + "',"
+            "'" + c2.lower() + "',"
+            "'" + winner + "',"
+            "'" + time.strftime('%Y-%m-%d %H:%M:%S') + "');")
+        print sqlString
+        cursor.execute(sqlString)
+        db.commit()
+        print 'commit'
 

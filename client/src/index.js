@@ -6,12 +6,15 @@ import os from 'os';
 import Select from 'react-select';
 import 'semantic-ui-css/semantic.min.css';
 import 'react-select/dist/react-select.css';
+import {reactLocalStorage} from 'reactjs-localstorage';
 import {Container, Divider, Header, Table, Form} from 'semantic-ui-react'
+import {Router, Route} from 'react-router';
 
 //const GET_COLORS   = 'http://' + os.hostname() + '/getColors';
 const GET_DECKS    = 'http://' + os.hostname() + '/getDecks';
 const GET_PLAYERS  = 'http://' + os.hostname() + '/getPlayers';
 const POST_MATCH   = 'http://' + os.hostname() + '/recordMatch';
+
 
 //const VALID_COLORS = 'rgbuw';
 
@@ -98,14 +101,14 @@ function toFormalColor(color, objectMap) {
     }
     return 'Unknown';
 }
+*/
 
-//TODO if needed
-function toColors(formalColor, objectMap) {
-    if (formalColor !== null && objectMap !== null) {
-        return toTitleCase(formalColor);
-    }
-    return null;
-}*/
+function toColors(objArray) {
+    var colors = '';
+    for(var i = 0; i < objArray.length; i++)
+        colors += objArray[i].value;
+    return colors.split('').sort().join('');
+}
 
 /**
  * All asynchronous loaded items
@@ -126,7 +129,7 @@ const getPlayers = () => {
 var decks = false;
 const getDecks = () => {
     if(!(!decks) !== false) {
-        return decks;
+        return Promise.resolve(decks);
     }
     else {
         return axios.get(GET_DECKS).then(response => {
@@ -136,18 +139,22 @@ const getDecks = () => {
     }
 };
 
+//trigger so it can cache faster
+getPlayers();
+getDecks();
+
 
 
 class MatchReport extends React.Component {
     constructor() {
         super();
         this.state = {
-            player1: null,
-            player2: null,
-            deck1: null,
-            deck2: null,
-            color1: [],
-            color2: [],
+            player1: reactLocalStorage.get('player1'),
+            player2: reactLocalStorage.get('player2'),
+            deck1: reactLocalStorage.get('deck1'),
+            deck2: reactLocalStorage.get('deck2'),
+            color1: reactLocalStorage.get('color1') || [],
+            color2: reactLocalStorage.get('color2') || [],
             result: null
         };
         this.handleSubmit = this.handleSubmit.bind(this);
@@ -156,41 +163,73 @@ class MatchReport extends React.Component {
         //change state to match form
     }
     handleSubmit(event) {
-        var payload = {
-            winner: this.state.result.value,
-            player1: this.state.player1.value,
-            player2: this.state.player2.value
-        };
-        console.log('post request:', payload);
-        return axios.post(POST_MATCH, payload)
-        .then(function (response) {
-            console.log(response);
-        })
-        .catch(function (error) {
-            console.log(error);
-        });
+        if(this.state.result !== null &&
+        this.state.player1 !== null &&
+        this.state.player2 !== null) {
+            var payload = {
+                winner: this.state.result.value,
+                player1: this.state.player1.value,
+                player2: this.state.player2.value,
+                deck1: this.state.deck1.value,
+                deck2: this.state.deck1.value,
+                colors1: toColors(this.state.color1),
+                colors2: toColors(this.state.color2)
+            };
+
+            console.log('color1-state', this.state.color1[0]);
+            console.log('color1', payload.colors1);
+            return axios.post(POST_MATCH, payload)
+                .then(function (response) {
+                    console.log(response);
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        }
     }
     selectPlayer(p, value) {
-        if(p === 1)
+        if(p === 1) {
+            reactLocalStorage.setObject('player1', value);
             this.setState({player1: value});
-        else
+        }
+        else {
+            reactLocalStorage.setObject('player2', value);
             this.setState({player2: value});
+        }
     }
     selectDeck(p, value) {
-        if(p === 1)
+        if(p === 1) {
+            reactLocalStorage.setObject('deck1', value);
             this.setState({deck1: value});
-        else
+        }
+        else {
+            reactLocalStorage.setObject('deck2', value);
             this.setState({deck2: value});
+        }
     }
     selectColors(p, value) {
-        console.log(value);
-        if(p === 1)
-            this.setState({color1:value});
-        else
-            this.setState({color2:value});
+        if(p === 1) {
+            reactLocalStorage.setObject('color1', value);
+            this.setState({color1: value});
+        }
+        else {
+            reactLocalStorage.setObject('color2', value);
+            this.setState({color2: value});
+        }
     }
     setResult(value){
         this.setState({result:value});
+    }
+    componentDidMount() {
+        this.setState({
+                player1: reactLocalStorage.getObject('player1'),
+                player2: reactLocalStorage.getObject('player2'),
+                deck1: reactLocalStorage.getObject('deck1'),
+                deck2: reactLocalStorage.getObject('deck2'),
+                color1: reactLocalStorage.getObject('color1') || [],
+                color2: reactLocalStorage.getObject('color2') || [],
+                result: null
+            });
     }
     render() {
         return (
