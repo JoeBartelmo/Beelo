@@ -74,6 +74,11 @@ class Implementation:
         player1 = self.getPlayer(name1)
         player2 = self.getPlayer(name2)
 
+        if player1 is None or player2 is None:
+            print 'Player name is not included in this elo instance: ' + name1
+            return
+
+
         expected1 = player1.compareRating(player2)
         expected2 = player2.compareRating(player1)
         
@@ -94,8 +99,8 @@ class Implementation:
         else:
             raise InputError('One of the names must be the winner or draw much be True')
 
-        player1.rating = rating1 + k * (score1 - expected1)
-        player2.rating = rating2 + k * (score2 - expected2)
+        player1.rating = float(rating1) + float(k) * (float(score1) - float(expected1))
+        player2.rating = float(rating2) + float(k) * (float(score2) - float(expected2))
 
     def getPlayerRating(self, name):
         """

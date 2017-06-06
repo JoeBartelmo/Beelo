@@ -1,0 +1,38 @@
+{
+    "u": "Blue",
+    "r": "Red",
+    "b": "Black", 
+    "w": "White", 
+    "g": "Green",
+    
+    "ru": "Izzet",
+    "gu": "Simic",
+    "uw": "Azorius",
+    "bu": "Dimir",
+    "br": "Rakdos", 
+    "bw": "Orzhov",
+    "bg": "Golgari",
+    "gr": "Gruul",
+    "gw": "Selesnia",
+    "rw": "Boros",
+
+    "bgr": "Jund",
+    "bgw": "Abzan",
+    "gru": "Temur",
+    "buw": "Esper",
+    "brw": "Mardu",
+    "ruw": "Jeskai",
+    "ugb": "Sultai",
+    "grw": "Naya",
+    "guw": "Bant",
+    "bru": "Grixis",
+    
+    "bgru": "URGB",
+    "bguw": "UGBW",
+    "bruw": "URBW",
+    "bgrw": "WGRB",
+    "gruw": "URGW",
+
+    "gruwb": "Rainbow"
+}
+
