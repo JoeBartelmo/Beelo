@@ -3,18 +3,10 @@ import ReactDOM from 'react-dom';
 
 import 'semantic-ui-css/semantic.min.css';
 import 'react-select/dist/react-select.css';
-import {Container, Divider, Header, Table, Form} from 'semantic-ui-react'
-import {Router, Route} from 'react-router';
+import {Container, Divider, Header} from 'semantic-ui-react'
+//import {Router, Route} from 'react-router';
 import {Leaderboard} from './components/Leaderboard';
 import {MatchReport} from './components/MatchReport';
-
-//services
-let RestService = require('./services/RestService.js').RestService();
-
-
-
-
-
 
 /**
  * Converts input string to title case string
@@ -48,6 +40,7 @@ function toFormalColor(color, objectMap) {
 }
 */
 
+let RestService = require('./services/RestService.js').RestService();
 ReactDOM.render(
     (<Container>
         <Header as='h1'>Elo System</Header>

@@ -10,7 +10,7 @@ module.exports.RestService = function RestService() {
     let constants = require('./Constants').Constants;
 
     this.components = {};
-    let resetComponents = () => {
+    let resetCache = () => {
         this.components = {
             cache: false,
             players: false,
@@ -33,9 +33,26 @@ module.exports.RestService = function RestService() {
         }
     }
 
+    /**
+     * Maps an object array of colors to the properly formatted color
+     * descriptor for the python flask module.
+     * @param objArray
+     * @returns {string}
+     */
+    function toColors(objArray) {
+        let colors = '';
+        for(let i = 0; i < objArray.length; i++)
+            colors += objArray[i].value;
+        return colors.split('').sort().join('');
+    }
+
+    /**
+     * Responsible for performing the get request to get all players.
+     * @returns Promise <List<Player>>
+     */
     const getPlayers = () => {
         if (this.components.players) {
-            console.log('me.components.players', JSON.stringify(me.components.players));
+            //console.log('me.components.players', JSON.stringify(me.components.players));
             return Promise.resolve(me.components.players);
         }
         else {
@@ -47,9 +64,14 @@ module.exports.RestService = function RestService() {
             });
         }
     };
+
+    /**
+     * Responsible for performing the get request to get all decks.
+     * @returns Promise <List<Deck>>
+     */
     const getDecks = () => {
         if(me.components.decks) {
-            console.log('me.components.decks', JSON.stringify(me.components.decks));
+            //console.log('me.components.decks', JSON.stringify(me.components.decks));
             return Promise.resolve(me.components.decks);
         }
         else {
@@ -64,9 +86,26 @@ module.exports.RestService = function RestService() {
 
 
     return {
-        resetComponents: resetComponents,
+        /**
+         * Synchronous, simply wipes cache so you can call the flask server
+         * directly.
+         */
+        resetCache: resetCache,
+
+        /**
+         * Returns a promise containing a list of player object types
+         */
         getPlayers: getPlayers,
+
+        /**
+         * Returns a promise containing a list of deck object types.
+         */
         getDecks: getDecks,
+
+        /**
+         * All get methods are cached locally
+         * @returns {Promise.<{}>}
+         */
         cacheAll: function cacheAll() {
             if (me.components.cache) {
                 console.log('All endpoints have already been cached...');
@@ -74,6 +113,32 @@ module.exports.RestService = function RestService() {
             }
             return Promise.all([getPlayers(), getDecks()])
                 .then(() => Promise.resolve(me.components));
-        }
+        },
+
+        /**
+         * Forms a post request to the flask service that
+         * @param object { player1, player2, winner, deck1, deck2, colors1, colors2 }
+         * @returns {Promise.<T>}
+         */
+        postMatch: function postMatch(object) {
+            if(object &&
+                object.result !== null &&
+                object.player1 !== null &&
+                object.player2 !== null) {
+                let payload = {
+                    winner: this.state.result.value,
+                    player1: this.state.player1.value,
+                    player2: this.state.player2.value,
+                    deck1: this.state.deck1.value,
+                    deck2: this.state.deck1.value,
+                    colors1: toColors(this.state.colors1),
+                    colors2: toColors(this.state.colors2)
+                };
+
+                return axios.post(constants.POST_MATCH, payload)
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+            }}
     }
 };

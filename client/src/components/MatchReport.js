@@ -2,19 +2,10 @@ import React from 'react';
 import {Table, Form} from 'semantic-ui-react'
 import Select from 'react-select';
 import {reactLocalStorage} from 'reactjs-localstorage';
+import {assert} from 'chai'
 
-let constants = require('../services/Constants.js').Constants;
-let axios = require('axios');
 //const VALID_COLORS = 'rgbuw';
 
-function toColors(objArray) {
-    let colors = '';
-    for(let i = 0; i < objArray.length; i++)
-        colors += objArray[i].value;
-    return colors.split('').sort().join('');
-}
-
-// format select options like this
 const results = [
     {label: 'Win', value: 'player1'},
     {label: 'Loss', value: 'player2'},
@@ -28,9 +19,19 @@ const colors = [
     {label: 'White', value: 'w'}
 ];
 
+/**
+ * MatchReport is the handler that allows one to select:
+ * players, deck architypes, deck colors, and who won or loss
+ */
 class MatchReport extends React.Component {
+
+    /**
+     * Establishes state
+     * @param args: { RestService }
+     */
     constructor(args) {
         super();
+        assert(args.RestService, 'MatchReport.js -> Expected arguments for constructor to contain RestService');
         this.RestService = args.RestService;
         this.state = {
             allPlayers: [],
@@ -44,32 +45,35 @@ class MatchReport extends React.Component {
         };
         this.handleSubmit = this.handleSubmit.bind(this);
     }
-    handleSubmit(event) {
-        if(this.state.result !== null &&
-            this.state.player1 !== null &&
-            this.state.player2 !== null) {
-            let payload = {
-                winner: this.state.result.value,
-                player1: this.state.player1.value,
-                player2: this.state.player2.value,
-                deck1: this.state.deck1.value,
-                deck2: this.state.deck1.value,
-                colors1: toColors(this.state.colors1),
-                colors2: toColors(this.state.colors2)
-            };
 
-            return axios.post(constants.POST_MATCH, payload)
-                .catch(function (error) {
-                    console.log(error);
-                });
-        }
+    /**
+     * Performs the post request to the rest service
+     * @param state
+     * @returns {*|Promise.<T>}
+     */
+    handleSubmit(state) {
+        return this.RestService.postMatch(this.state);
     }
+
+    /**
+     * On select for any input, we put the item into local storage for caching
+     * and we assign this.state.obj -> value so the select inputs are properly
+     * bound
+     * @param obj
+     * @param value
+     */
     select(obj,value) {
         reactLocalStorage.setObject(obj, value);
         let newState = this.state;
         newState[obj] = value;
         this.setState(newState);
     }
+
+    /**
+     * Renders the match report DOM and binds all states to this.state.
+     * TODO: [Maybe] Should be seperated out into multiple components; to be decided
+     * @returns {XML}
+     */
     render() {
         return (
             <div id='matchReport'>
@@ -137,8 +141,8 @@ class MatchReport extends React.Component {
                 </Table>
                 <Select
                     value={this.state.result}
-                    placeholder='Select Player 1 win/loss/draw'
-                    onChange={(e) => this.setResult(e)}
+                    placeholder='Select Player 1 Win/Loss/Draw'
+                    onChange={(e) => this.select('result', e)}
                     options={results} />
                 <br/>
                 <Form onSubmit={this.handleSubmit} style={{float:'right'}}>
