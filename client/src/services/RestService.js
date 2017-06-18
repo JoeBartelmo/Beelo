@@ -126,13 +126,13 @@ module.exports.RestService = function RestService() {
                 object.player1 !== null &&
                 object.player2 !== null) {
                 let payload = {
-                    winner: this.state.result.value,
-                    player1: this.state.player1.value,
-                    player2: this.state.player2.value,
-                    deck1: this.state.deck1.value,
-                    deck2: this.state.deck1.value,
-                    colors1: toColors(this.state.colors1),
-                    colors2: toColors(this.state.colors2)
+                    winner: object.result.value,
+                    player1: object.player1.value,
+                    player2: object.player2.value,
+                    deck1: object.deck1.value,
+                    deck2: object.deck1.value,
+                    colors1: toColors(object.colors1),
+                    colors2: toColors(object.colors2)
                 };
 
                 return axios.post(constants.POST_MATCH, payload)
