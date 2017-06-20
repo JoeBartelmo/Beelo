@@ -77,6 +77,12 @@ class MatchReport extends React.Component {
     render() {
         return (
             <div id='matchReport'>
+                 <div style={{"paddingBottom":"10px"}}>
+                     Below is the match reporting system, select the players, the decks they
+                     were playing and the colors of the decks, as well as whether the first
+                     player won or lost. Once Ready, click the button at the bottom to submit
+                     the match report.
+                 </div>
                 <Table definition>
                     <Table.Header>
                         <Table.HeaderCell>Description</Table.HeaderCell>

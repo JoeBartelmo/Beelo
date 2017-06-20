@@ -3,10 +3,8 @@ import ReactDOM from 'react-dom';
 
 import 'semantic-ui-css/semantic.min.css';
 import 'react-select/dist/react-select.css';
-import {Container, Divider, Header} from 'semantic-ui-react'
-//import {Router, Route} from 'react-router';
-import {Leaderboard} from './components/Leaderboard';
-import {MatchReport} from './components/MatchReport';
+import { RestLeaderboard, RestMatchReport} from './Wrappers';
+import {Container, Menu, Header} from 'semantic-ui-react';
 
 /**
  * Converts input string to title case string
@@ -40,19 +38,28 @@ function toFormalColor(color, objectMap) {
 }
 */
 
-let RestService = require('./services/RestService.js').RestService();
-ReactDOM.render(
-    (<Container>
-        <Header as='h1'>Elo System</Header>
-        <div style={{"paddingBottom":"10px"}}>
-            Below is the match reporting system, select the players, the decks they
-            were playing and the colors of the decks, as well as whether the first
-            player won or lost. Once Ready, click the button at the bottom to submit
-            the match report.
+import {
+    BrowserRouter as Router,
+    Route
+} from 'react-router-dom'
+
+
+let activeItem = window.location.pathname;
+const BasicExample = () => (
+    <Router>
+        <div>
+            <Container>
+                <Menu pointing secondary>
+                    <Menu.Item name='home' active={activeItem.includes('leaderboard')} href="/leaderboard"/>
+                    <Menu.Item name='report match' active={activeItem.includes('report')} href="/reportMatch"/>
+                </Menu>
+                <Header as='h1'>Elo System</Header>
+                <Route exact path="/" component={RestLeaderboard}/>
+                <Route exact path="/leaderboard" component={RestLeaderboard}/>
+                <Route path="/reportMatch" component={RestMatchReport}/>
+            </Container>
         </div>
-        <MatchReport RestService={RestService}/>
-        <Divider/>
-        <Leaderboard RestService={RestService}/>
-    </Container>),
-    document.getElementById('root')
+    </Router>
 );
+
+ReactDOM.render(React.createElement(BasicExample), document.getElementById('menuroot'));

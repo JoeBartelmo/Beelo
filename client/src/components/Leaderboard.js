@@ -51,6 +51,10 @@ class Leaderboard extends React.Component {
      */
     render() {
         return (
+        <div>
+            <div style={{"paddingBottom":"10px"}}>
+                Below is the current standings for the elo system.
+            </div>
             <Table celled padded>
                 <Table.Header>
                     <Table.HeaderCell>Elo Rating</Table.HeaderCell>
@@ -60,6 +64,7 @@ class Leaderboard extends React.Component {
                     {this.state.players}
                 </Table.Body>
             </Table>
+        </div>
         )
     }
 }
