@@ -1,5 +1,3 @@
-'use strict';
-
 import React from 'react';
 import { Segment, Button, Divider } from 'semantic-ui-react'
 import {assert} from 'chai';

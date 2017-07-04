@@ -1,5 +1,3 @@
-'use strict';
-
 import React from 'react';
 import {Table, Form} from 'semantic-ui-react'
 import Select from 'react-select';
@@ -82,11 +80,13 @@ class MatchReport extends React.Component {
                      player won or lost. Once Ready, click the button at the bottom to submit
                      the match report.
                  </div>
-                <Table stacking>
+                <Table>
                     <Table.Header>
-                        <Table.HeaderCell>Description</Table.HeaderCell>
-                        <Table.HeaderCell>Player 1</Table.HeaderCell>
-                        <Table.HeaderCell>Player 2</Table.HeaderCell>
+                        <Table.Row>
+                            <Table.HeaderCell>Description</Table.HeaderCell>
+                            <Table.HeaderCell>Player 1</Table.HeaderCell>
+                            <Table.HeaderCell>Player 2</Table.HeaderCell>
+                        </Table.Row>
                     </Table.Header>
                     <Table.Body>
                         <Table.Row>

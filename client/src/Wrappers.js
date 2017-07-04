@@ -1,5 +1,3 @@
-'use strict';
-
 import React from 'react';
 import {Leaderboard} from './components/Leaderboard';
 import {MatchReport} from './components/MatchReport';

@@ -1,5 +1,3 @@
-'use strict';
-
 import React from 'react';
 import {Table} from 'semantic-ui-react'
 import {assert} from 'chai';
@@ -32,7 +30,7 @@ class Leaderboard extends React.Component {
             result = result || {options:[]};
             for (let i = 0; i < result.options.length; i++) {
                 result.options[i] = (
-                    <Table.Row>
+                    <Table.Row key={result.options[i].value + '-' + result.options[i].tag}>
                         <Table.Cell>{result.options[i].value}</Table.Cell>
                         <Table.Cell>{result.options[i].tag}</Table.Cell>
                     </Table.Row>);
@@ -56,8 +54,10 @@ class Leaderboard extends React.Component {
             </div>
             <Table celled padded>
                 <Table.Header>
-                    <Table.HeaderCell>Elo Rating</Table.HeaderCell>
-                    <Table.HeaderCell>Name</Table.HeaderCell>
+                    <Table.Row>
+                        <Table.HeaderCell>Elo Rating</Table.HeaderCell>
+                        <Table.HeaderCell>Name</Table.HeaderCell>
+                    </Table.Row>
                 </Table.Header>
                 <Table.Body>
                     {this.state.players}

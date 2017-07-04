@@ -1,5 +1,3 @@
-'use strict';
-
 const utilities = function Utilities() {
 
     let allColors = {

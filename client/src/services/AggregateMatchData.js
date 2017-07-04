@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * This aggregates all of the match data into a usable statistical form.
  * deck and players both consist of an object that contains two integer types
@@ -13,7 +11,7 @@
  */
 module.exports.AggregateMatchData = function AggregateMatchData(myDeck, matches) {
     let utils = require('./Utilities').Utilities;
-    let friendlyName = utils.getColorName(myDeck) + ' ' + utils.toTitleCase(myDeck.name);
+    //let friendlyName = utils.getColorName(myDeck) + ' ' + utils.toTitleCase(myDeck.name);
     //used to determine favoured archetypes
     let decks = {}; // "architype": {colors: {win: int, total: int }, win: int, total: int }
         //used to determine successful pilots
@@ -29,7 +27,7 @@ module.exports.AggregateMatchData = function AggregateMatchData(myDeck, matches)
             match.players[1].deck.colors === deck.colors) {
             return match.players[1].name;
         }
-        console.error('The given match does not contain deck "' + deck.name + '"');
+        //console.error('The given match does not contain deck "' + friendlyName + '"');
         return null;
     }
 

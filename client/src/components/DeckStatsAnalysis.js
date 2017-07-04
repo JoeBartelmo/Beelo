@@ -1,4 +1,3 @@
-'use strict';
 import React from 'react';
 import { Segment, Grid, Menu, Header} from 'semantic-ui-react'
 import {assert} from 'chai';
@@ -66,6 +65,9 @@ class DeckStatsAnalysis extends React.Component {
                         let pieChart = charts.PlayerBaseAnalytics(this.deck, data.getPlayers());
                         this.playerChart = new highcharts["Chart"]("player-stats", pieChart);
                         break;
+                    default:
+                        console.error('Invalid choice made for active item: ' + me.state.activeItem);
+                        break;
                 }
             });
     }
@@ -95,9 +97,9 @@ class DeckStatsAnalysis extends React.Component {
         let getImageColors = () => {
             let colors = utils.toColors(me.state.colors).split('');
             if (colors.length === 0) {
-                return [(<img style={{width:'20px',height:'20px'}}  src={require('../images/c.png')}/>)];
+                return [(<img key={new Date().getMilliseconds()}  alt={'c'} style={{width:'20px',height:'20px'}}  src={require('../images/c.png')}/>)];
             }
-            return colors.map((color) => (<img style={{width:'20px',height:'20px'}}  src={require('../images/' + color + '.png')}/>));
+            return colors.map((color) => (<img key={new Date().getMilliseconds()} alt={color} style={{width:'20px',height:'20px'}}  src={require('../images/' + color + '.png')}/>));
         };
 
 

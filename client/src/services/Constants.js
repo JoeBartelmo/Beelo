@@ -1,5 +1,3 @@
-'use strict';
-
 let host = 'http://' + require('os').hostname();
 module.exports.Constants = {
     GET_COLORS: host + '/getColors',

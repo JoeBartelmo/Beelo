@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * Service for managing the rest calls to the python service.
  */
