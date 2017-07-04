@@ -93,18 +93,15 @@ def getDecks():
     return jsonify({"decks": decks})
 
 @app.route("/getGames")
-def getGames():
+def getGamesQuery():
     """
     Obtains a list of all reported games
     """
-    games = []
-    cur.execute("SELECT * FROM game")
-    for game in cur.fetchall():
-        games.append({'players': [
-            {'name': game[0], 'deck': {'name': game[2], 'colors': game[3]}}, 
-            {'name': game[1], 'deck': {'name': game[4], 'colors': game[5]}}], 
-            'winner': game[6],
-            'timestamp': game[7]})
+    player = request.args.get('player')
+    deck = request.args.get('deck')
+    colors = request.args.get('colors')
+
+    games = getGames(db,player, deck, colors)
     return jsonify({"games": games})
 
 color_cache = None
@@ -139,6 +136,7 @@ def reportMatch():
         }
 
         """
+
         body = request.get_json()
         refreshImplementation(db, root_implementation)
 

@@ -1,6 +1,5 @@
-/**
- * Created by joe on 6/11/17.
- */
+'use strict';
+
 import React from 'react';
 import {Table} from 'semantic-ui-react'
 import {assert} from 'chai';

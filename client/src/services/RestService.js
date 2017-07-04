@@ -1,6 +1,4 @@
-/**
- * Created by joe on 6/11/17.
- */
+'use strict';
 
 /**
  * Service for managing the rest calls to the python service.
@@ -8,12 +6,14 @@
 module.exports.RestService = function RestService() {
     let axios = require('axios');
     let constants = require('./Constants').Constants;
+    let utils = require('./Utilities').Utilities;
 
     this.components = {};
     let resetCache = () => {
         this.components = {
             cache: false,
             players: false,
+            colors: false,
             decks: false
         };
     };
@@ -31,19 +31,6 @@ module.exports.RestService = function RestService() {
             value: val,
             tag: tag
         }
-    }
-
-    /**
-     * Maps an object array of colors to the properly formatted color
-     * descriptor for the python flask module.
-     * @param objArray
-     * @returns {string}
-     */
-    function toColors(objArray) {
-        let colors = '';
-        for(let i = 0; i < objArray.length; i++)
-            colors += objArray[i].value;
-        return colors.split('').sort().join('');
     }
 
     /**
@@ -77,13 +64,12 @@ module.exports.RestService = function RestService() {
         else {
             return axios.get(constants.GET_DECKS).then(response => {
                 me.components.decks = {
-                    options: response.data.decks.map(deck => mapToOption(deck))
+                    options: response.data.decks.map(deck => mapToOption(utils.toTitleCase(deck)))
                 };
                 return me.components.decks;
             });
         }
     };
-
 
     return {
         /**
@@ -129,16 +115,39 @@ module.exports.RestService = function RestService() {
                     winner: object.result.value,
                     player1: object.player1.value,
                     player2: object.player2.value,
-                    deck1: object.deck1.value,
-                    deck2: object.deck1.value,
-                    colors1: toColors(object.colors1),
-                    colors2: toColors(object.colors2)
+                    deck1: object.deck1.value.toLowerCase(),
+                    deck2: object.deck2.value.toLowerCase(),
+                    colors1: utils.toColors(object.colors1),
+                    colors2: utils.toColors(object.colors2)
                 };
 
                 return axios.post(constants.POST_MATCH, payload)
                     .catch(function (error) {
                         console.log(error);
                     });
-            }}
+            }},
+
+        /**
+         * Grabs All matches if object is null, otherwise forms a query for target game set
+         * @param object { player: string, deck: string, colors: array }
+         * @returns {Promise.<TResult>}
+         */
+        getMatches: function getMatches(object) {
+            if(object) {
+                let url = constants.GET_MATCHES + '?';
+                if(object.player) {
+                    url += 'player=' + object.player + '&'
+                }
+                if (object.deck) {
+                    url += 'deck=' + object.deck.toLowerCase() + '&colors=' + utils.toColors(object.colors)
+                }
+                return axios.get(url)
+                    .then(response => {return response.data.games });
+            }
+            else {
+                return axios.get(constants.GET_MATCHES)
+                    .then(response => {return response.data.games });
+            }
+        }
     }
 };
