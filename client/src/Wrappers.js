@@ -1,9 +1,7 @@
-/**
- * Created by joe on 6/18/17.
- */
 import React from 'react';
 import {Leaderboard} from './components/Leaderboard';
 import {MatchReport} from './components/MatchReport';
+import {DeckStats} from './components/DeckStatsContainer';
 
 let RestService = require('./services/RestService.js').RestService();
 
@@ -15,4 +13,8 @@ class RestMatchReport extends React.Component {
     render() { return (<MatchReport RestService={RestService} />); }
 }
 
-export {RestLeaderboard, RestMatchReport};
+class RestDeckStats extends React.Component {
+    render() { return (<DeckStats RestService={RestService} />); }
+}
+
+export {RestLeaderboard, RestMatchReport, RestDeckStats};

@@ -4,20 +4,17 @@ import Select from 'react-select';
 import {reactLocalStorage} from 'reactjs-localstorage';
 import {assert} from 'chai'
 
-//const VALID_COLORS = 'rgbuw';
+let consts = require('../services/Constants').Constants;
+let colors = consts.COLORS;
+let results = consts.RESULTS;
 
-const results = [
-    {label: 'Win', value: 'player1'},
-    {label: 'Loss', value: 'player2'},
-    {label: 'Draw', value: 'draw'}
-];
-const colors = [
-    {label: 'Red', value: 'r'},
-    {label: 'Blue', value: 'u'},
-    {label: 'Green', value: 'g'},
-    {label: 'Black', value: 'b'},
-    {label: 'White', value: 'w'}
-];
+const STATE_PLAYER1 = 'player1',
+    STATE_PLAYER2 = 'player2',
+    STATE_DECK1 = 'deck1',
+    STATE_DECK2 = 'deck2',
+    STATE_COLORS1 = 'colors1',
+    STATE_COLORS2 = 'colors2';
+
 
 /**
  * MatchReport is the handler that allows one to select:
@@ -35,12 +32,12 @@ class MatchReport extends React.Component {
         this.RestService = args.RestService;
         this.state = {
             allPlayers: [],
-            player1: reactLocalStorage.getObject('player1'),
-            player2: reactLocalStorage.getObject('player2'),
-            deck1: reactLocalStorage.getObject('deck1'),
-            deck2: reactLocalStorage.getObject('deck2'),
-            colors1: reactLocalStorage.getObject('colors1') || [],
-            colors2: reactLocalStorage.getObject('colors2') || [],
+            player1: reactLocalStorage.getObject(STATE_PLAYER1),
+            player2: reactLocalStorage.getObject(STATE_PLAYER2),
+            deck1: reactLocalStorage.getObject(STATE_DECK1),
+            deck2: reactLocalStorage.getObject(STATE_DECK2),
+            colors1: reactLocalStorage.getObject(STATE_COLORS1) || [],
+            colors2: reactLocalStorage.getObject(STATE_COLORS2) || [],
             result: null
         };
         this.handleSubmit = this.handleSubmit.bind(this);
@@ -83,11 +80,13 @@ class MatchReport extends React.Component {
                      player won or lost. Once Ready, click the button at the bottom to submit
                      the match report.
                  </div>
-                <Table definition>
+                <Table>
                     <Table.Header>
-                        <Table.HeaderCell>Description</Table.HeaderCell>
-                        <Table.HeaderCell>Player 1</Table.HeaderCell>
-                        <Table.HeaderCell>Player 2</Table.HeaderCell>
+                        <Table.Row>
+                            <Table.HeaderCell>Description</Table.HeaderCell>
+                            <Table.HeaderCell>Player 1</Table.HeaderCell>
+                            <Table.HeaderCell>Player 2</Table.HeaderCell>
+                        </Table.Row>
                     </Table.Header>
                     <Table.Body>
                         <Table.Row>
@@ -95,15 +94,15 @@ class MatchReport extends React.Component {
                             <Table.Cell>
                                 <Select.Async
                                     value={this.state.player1}
-                                    placeholder='Select a deck'
-                                    onChange={(e) => this.select('player1', e)}
+                                    placeholder='Select Player 1'
+                                    onChange={(e) => this.select(STATE_PLAYER1, e)}
                                     loadOptions={this.RestService.getPlayers} />
                             </Table.Cell>
                             <Table.Cell>
                                 <Select.Async
                                     value={this.state.player2}
-                                    placeholder='Select a deck'
-                                    onChange={(e) => this.select('player2', e)}
+                                    placeholder='Select Player 2'
+                                    onChange={(e) => this.select(STATE_PLAYER2, e)}
                                     loadOptions={this.RestService.getPlayers} />
                             </Table.Cell>
                         </Table.Row>
@@ -112,15 +111,15 @@ class MatchReport extends React.Component {
                             <Table.Cell>
                                 <Select.Async
                                     value={this.state.deck1}
-                                    placeholder='Select a deck'
-                                    onChange={(e) => this.select('deck1', e)}
+                                    placeholder='Select Deck Archetype'
+                                    onChange={(e) => this.select(STATE_DECK1, e)}
                                     loadOptions={this.RestService.getDecks} />
                             </Table.Cell>
                             <Table.Cell>
                                 <Select.Async
                                     value={this.state.deck2}
-                                    placeholder='Select a deck'
-                                    onChange={(e) => this.select('deck2', e)}
+                                    placeholder='Select Deck Archetype'
+                                    onChange={(e) => this.select(STATE_DECK2, e)}
                                     loadOptions={this.RestService.getDecks} />
                             </Table.Cell>
                         </Table.Row>
@@ -131,7 +130,7 @@ class MatchReport extends React.Component {
                                     multi
                                     value={this.state.colors1}
                                     placeholder='Select Deck Colors'
-                                    onChange={(e) => this.select('colors1', e)}
+                                    onChange={(e) => this.select(STATE_COLORS1, e)}
                                     options={colors} />
                             </Table.Cell>
                             <Table.Cell>
@@ -139,7 +138,7 @@ class MatchReport extends React.Component {
                                     multi
                                     value={this.state.colors2}
                                     placeholder='Select Deck Colors'
-                                    onChange={(e) => this.select('colors2', e)}
+                                    onChange={(e) => this.select(STATE_COLORS2, e)}
                                     options={colors} />
                             </Table.Cell>
                         </Table.Row>

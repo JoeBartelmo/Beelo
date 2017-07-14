@@ -141,4 +141,4 @@ class _Player:
         @param opponenet - the player to compare against.
         @returns - The expected score between the two players.
         """
-        return ( 1+10**( ( opponent.rating-self.rating )/400 ) ) ** -1
+        return 1 + pow(10, ( opponent.rating-self.rating )/400) ** -1

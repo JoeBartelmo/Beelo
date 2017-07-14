@@ -97,7 +97,7 @@ def getPlayer(db, name):
 	for player in cur.fetchall():
 		players.append({"name":player[0],"rating":float(player[1])})
         if len(players) == 1:
-            return players[0]
+                return players[0]
         return None
 
 def addPlayersJson(db, jsonFile):
@@ -120,26 +120,80 @@ def addDeck(db, name, colors):
     @param name: name of the deck
     '''
     if name is not None and colors is not None:
-        db.cursor().execute(('INSERT IGNORE INTO deck VALUES ('
-            "'" + name.lower() + "',"
-            "'" + colors.lower() + "');"))
-        db.commit()
+            db.cursor().execute(('INSERT IGNORE INTO deck VALUES ('
+                    "'" + name.lower() + "',"
+                    "'" + colors.lower() + "');"))
+            db.commit()
 
 def addGame(db, p1, p2, d1, d2, c1, c2, winner):
+    '''
+    Inserts a new game into the database
+    @param p1: player 1
+    @param p2: player 2
+    @param d1: deck 1
+    @param d2: deck 2
+    @param c1: colors 1 (optional)
+    @param c2: colors 2 (optional) -- these both default to colorless when null
+    @param winner: player 1 || player 2 || draw
+    '''
     cursor = db.cursor()
-    if p1 is not None and p2 is not None and d1 is not None and d2 is not None:
-        print 'executing'
-        sqlString = ('INSERT INTO game VALUES ('
-            "'" + p1 + "',"
-            "'" + p2 + "',"
-            "'" + d1.lower() + "',"
-            "'" + c1.lower() + "',"
-            "'" + d2.lower() + "',"
-            "'" + c2.lower() + "',"
-            "'" + winner + "',"
-            "'" + time.strftime('%Y-%m-%d %H:%M:%S') + "');")
-        print sqlString
-        cursor.execute(sqlString)
-        db.commit()
-        print 'commit'
+    if p1 is not None and p2 is not None and d1 is not None and d2 is not None and winner is not None:
+            sqlString = ('INSERT INTO game VALUES ('
+                    "'" + p1 + "',"
+                    "'" + p2 + "',"
+                    "'" + d1.lower() + "',"
+                    "'" + c1.lower() + "',"
+                    "'" + d2.lower() + "',"
+                    "'" + c2.lower() + "',"
+                    "'" + winner + "',"
+                    "'" + time.strftime('%Y-%m-%d %H:%M:%S') + "');")
+            print sqlString
+            cursor.execute(sqlString)
+            db.commit()
+
+def getGames(db, player, deck, colors):
+    '''
+    Searches for all matches with chosen player & || deck & || colors
+    @param db: database to search
+    @param player: player to search through
+    @param colors: (only searches if deck is not null) colors of deck
+    '''
+    cursor = db.cursor()
+
+    if player is not None or deck is not None or colors is not None:
+            sqlStr1 = '(SELECT * FROM game WHERE '
+            sqlStr2 = '(SELECT * FROM game WHERE '
+            needsAnd = False
+            if player is not None:
+                    sqlStr1 += 'player1 = \'' + player + '\''
+                    sqlStr2 += 'player2 = \'' + player + '\''
+                    needsAnd = True
+            if deck is not None:
+                    if needsAnd:
+                            sqlStr1 += ' AND '
+                            sqlStr2 += ' AND '
+                    if colors is None:
+                            colors = ''
+                    sqlStr1 += 'deck1 = \'' + deck + '\''
+                    sqlStr2 += 'deck2 = \'' + deck + '\''
+                    sqlStr1 += ' AND '
+                    sqlStr2 += ' AND '
+                    sqlStr1 += 'colors1 = \'' + colors + '\''
+                    sqlStr2 += 'colors2 = \'' + colors + '\''
+
+            sqlstr = sqlStr1 + ') UNION ' + sqlStr2 + ');' 
+            print sqlstr
+            cursor.execute(sqlstr)
+    else:
+            cursor.execute('SELECT * FROM game;')
+    games = []
+    for game in cursor.fetchall():
+            games.append({'players': [
+                {'name': game[0], 
+                    'deck': {'name': game[2], 'colors': game[3]}}, 
+                {'name': game[1], 
+                    'deck': {'name': game[4], 'colors': game[5]}}], 
+                'winner': game[6],
+                'timestamp': game[7]})
+    return games
 
