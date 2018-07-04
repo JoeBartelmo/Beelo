@@ -1,0 +1,5 @@
+elo
+Flask
+mysqlclient
+mysql-connector
+flask_cors

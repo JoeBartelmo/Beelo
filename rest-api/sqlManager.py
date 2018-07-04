@@ -34,43 +34,6 @@ def refreshImplementation(db, imp):
         for player in cursor.fetchall():
                 imp.addPlayer(player[0],rating=player[1])
 
-def createTables(db):
-        '''
-        Creates three tables in the database:
-        elo (name, ranking)
-        deck (id, name, colors)
-        game (id, player1, player2, deck1, deck2, player1_wins, player2_wins)
-        '''
-        db.cursor().execute(("CREATE TABLE IF NOT EXISTS elo ("
-                "name varchar(255),"
-                "rating decimal NOT NULL,"
-                "PRIMARY KEY (name))"))
-
-        db.cursor().execute(("CREATE TABLE IF NOT EXISTS deck (" 
-                "name varchar(512) NOT NULL,"
-                "colors varchar(5) NOT NULL,"
-                "CONSTRAINT full_deck UNIQUE (name,colors))"))
-
-        db.cursor().execute(("CREATE TABLE IF NOT EXISTS game ("
-                "player1 varchar(255) NOT NULL,"
-                "player2 varchar(255) NOT NULL,"
-                "deck1 varchar(255) NOT NULL,"
-                "colors1 varchar(5) NOT NULL,"
-                "deck2 varchar(255) NOT NULL,"
-                "colors2 varchar(5) NOT NULL,"
-                "winner varchar(255) NOT NULL,"
-                "stamp datetime NOT NULL,"
-                "FOREIGN KEY (player1) REFERENCES elo(name),"
-                "FOREIGN KEY (player2) REFERENCES elo(name),"
-                "FOREIGN KEY (deck1, colors1) REFERENCES deck(name, colors),"
-                "FOREIGN KEY (deck2, colors2) REFERENCES deck(name, colors),"
-                "CONSTRAINT check_winner CHECK "
-                    "(winner=player1.name OR winner=player2.name OR "
-                    "winner='draw')"
-                ")"))
-
-        db.commit()
-
 def addPlayer(db, name, elo = 1000.0, holdCommit = False):
         '''
         Adds a given player into the elo database

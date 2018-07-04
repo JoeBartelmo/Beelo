@@ -1,5 +1,5 @@
 {
-    "notes": "BE SURE TO RENAME THIS FILE TO config.json ONCE YOU'RE DONE",
+    "notes": "BE SURE TO RENAME THIS FILE TO rest-api/config.json ONCE YOU'RE DONE",
     "database": "mysql database to connect to",
     "username": "username for above database",
     "password": "password for above username",

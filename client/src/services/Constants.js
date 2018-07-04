@@ -1,4 +1,4 @@
-let host = 'http://' + require('os').hostname();
+let host = 'http://flask:3000';
 module.exports.Constants = {
     GET_COLORS: host + '/getColors',
     GET_DECKS: host + '/getDecks',

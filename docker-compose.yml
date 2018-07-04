@@ -1,0 +1,28 @@
+version: '3'
+services:
+    sql:
+        image: mysql:latest
+        environment:
+            MYSQL_DATABASE: beelo
+            MYSQL_USER: beelouser
+            MYSQL_PASSWORD: password # change this if you wanna be secure
+            MYSQL_ROOT_PASSWORD: root # change this if you wanna be secure
+        volumes:
+            - ./sql/tables.sql:/docker-entrypoint-initdb.d/tables.sql
+        ports:
+            - 3306:3306
+    flask:
+        build: ./rest-api
+        environment:
+            # if you change the above besure to get these too
+            MYSQL_DATABASE: beelo
+            MYSQL_USER: beelouser
+            MYSQL_PASSWORD: password
+            MYSQL_ROOT_PASSWORD: root
+        ports:
+            - 80:80
+            - 8080:8080
+            - 443:443
+            - 3000:3000
+    client:
+

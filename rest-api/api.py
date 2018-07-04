@@ -11,6 +11,7 @@ import MySQLdb
 import json
 import sys
 import argparse
+import os
 from os.path import isfile
 from sqlManager import *
 
@@ -211,10 +212,15 @@ if __name__ == "__main__":
                 and isfile(server_configuration):
                 with open(server_configuration) as json_data:
                         jsonContents = json.load(json_data)
-                args.username = jsonContents['username']
-                args.password = jsonContents['password']
-                args.db       = jsonContents['database']
-                args.route    = jsonContents['route']
+                #args.username = jsonContents['username']
+                #args.password = jsonContents['password']
+                #args.db       = jsonContents['database']
+                #args.route    = jsonContents['route']
+                #args.players  = jsonContents['players']
+                args.username = os.environ.get('MYSQL_USER')
+                args.password = os.environ.get('MYSQL_PASSWORD')
+                args.db       = os.environ.get('MYSQL_DATABASE')
+                args.route    = '127.0.0.1'
                 args.players  = jsonContents['players']
         # if there are no arguments, and there is no config file
         elif args.db is None and args.username is None and \
@@ -222,12 +228,11 @@ if __name__ == "__main__":
                 print 'Invalid arguments or configuration file, run with --help'
                 print 'Alternatively configure your config.json file.'
                 sys.exit(1)
-        db = MySQLdb.connect(host='localhost',
-                             user = args.username,
-                             passwd = args.password,
+        print args
+        db = MySQLdb.connect(host='sql',\
+                             user = args.username,\
+                             passwd = args.password,\
                              db = args.db)
-        # Instantiate all the tables if they don't exist
-        createTables(db)
         # Add players if they don't already exist
         if args.players is not None:
             addPlayersJson(db, args.players)
