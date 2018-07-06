@@ -24,6 +24,7 @@ root_implementation = Implementation()
 server_configuration = './config.json'
 deck_list = './data/decks.json'
 color_list = './data/color_translations.json'
+global args
 args = None
 
 def getKey(jsonDict, key, res = None):
@@ -36,44 +37,43 @@ def getKey(jsonDict, key, res = None):
 
 @app.route("/")
 def index():
-        """
-        Simply renders the root page for the site.
-        @return the rendered root html
-        """
-        global args
-        return redirect('http://' + args.route + ":3000", code=302)
+    """
+    Simply renders the root page for the site.
+    @return the rendered root html
+    """
+    return redirect('http://' + args.route + ":3000", code=302)
 
 @app.route("/getPlayers")
 def getPlayers():
-        """
-        Obtains the generic ELO ratings for each player in the elo database.
-        @return a json object listing players and their attributes
-        """
-        #TODO:
-        #ordering = request.args.get('order')
-        #filterBy = request.args.get('filter')
-        #sqlFilter = ''
-        #if filterBy is not None:
-        #    if filterBy.lower() == 'elo':
-        #        
-        players = []
-	cur.execute("SELECT * FROM elo ORDER BY rating DESC")
-	for player in cur.fetchall():
-		players.append({"name":player[0],"rating":float(player[1])})
-	#players = sorted(players, key=itemgetter('rating'), reverse=True)
-        return jsonify({"players":players})
+    """
+    Obtains the generic ELO ratings for each player in the elo database.
+    @return a json object listing players and their attributes
+    """
+    #TODO:
+    #ordering = request.args.get('order')
+    #filterBy = request.args.get('filter')
+    #sqlFilter = ''
+    #if filterBy is not None:
+    #    if filterBy.lower() == 'elo':
+    #        
+    players = []
+    cur.execute("SELECT * FROM elo ORDER BY rating DESC")
+    for player in cur.fetchall():
+        players.append({"name":player[0],"rating":float(player[1])})
+    players = sorted(players, key=itemgetter('rating'), reverse=True)
+    return jsonify({"players":players})
 
 @app.route("/getPlayer")
 def getPlayer(player = None):
-        """
-        Obtains the generic ELO ratings for one player in the elo database.
-        @return a json object list of one player and their attributes
-        """
-	#refreshImplementation(db, root_implementation)
-        players = []
-        if player is None:
-            player = request.args.get('name')
-        return jsonify({"player":getPlayer(db, player)})
+    """
+    Obtains the generic ELO ratings for one player in the elo database.
+    @return a json object list of one player and their attributes
+    """
+    #refreshImplementation(db, root_implementation)
+    players = []
+    if player is None:
+        player = request.args.get('name')
+    return jsonify({"player":getPlayer(db, player)})
 
 @app.route("/getDecks")
 def getDecks():
@@ -83,14 +83,14 @@ def getDecks():
     decks = []
     cur.execute("SELECT DISTINCT name FROM deck")
     for deck in cur.fetchall():
-            decks.append(deck[0])
+        decks.append(deck[0])
     with open(deck_list) as json_data:
-            jsonContents = json.load(json_data)
+        jsonContents = json.load(json_data)
     for deck in jsonContents:
-            # this is slow for sets of decks > 10000, so we don't care
-            # but TODO would be to fix this impl
-            if deck.lower() not in [x.lower() for x in decks]:
-                    decks.append(deck)
+        # this is slow for sets of decks > 10000, so we don't care
+        # but TODO would be to fix this impl
+        if deck.lower() not in [x.lower() for x in decks]:
+            decks.append(deck)
     return jsonify({"decks": decks})
 
 @app.route("/getGames")
@@ -113,12 +113,12 @@ def getColors():
     """
     global color_cache
     if color_cache is None:
-            color_cache = {}
-            with open(color_list) as json_data:
-                    jsonContents = json.load(json_data)
-            for color in jsonContents:
-                    color_cache[color] = jsonContents[color]
-            color_cache = jsonify({"colors": color_cache})
+        color_cache = {}
+        with open(color_list) as json_data:
+            jsonContents = json.load(json_data)
+        for color in jsonContents:
+            color_cache[color] = jsonContents[color]
+        color_cache = jsonify({"colors": color_cache})
 
     return color_cache
 
@@ -178,9 +178,9 @@ def reportMatch():
                 addGame(db, player1, player2, 
                         deck1, deck2, colors1, colors2, win)
 
-            print 'Match succesfully processed!'
+            print('Match succesfully processed!')
             return jsonify({})
-        print 'Player 1 or player 2 was null; cannot process match request'
+        print('Player 1 or player 2 was null; cannot process match request')
 
 if __name__ == "__main__":
         parser = argparse.ArgumentParser(description = "This file [api.py] is"\
@@ -203,8 +203,6 @@ if __name__ == "__main__":
         parser.add_argument("--players", metavar = "Route",
                 type = str, help="a string associated with the path to a json"\
                         " file that is populated with players (data/blah.json)")
-
-        global args
         args = parser.parse_args()
         # If there are no arguments and the config file exists
         if args.db is None and args.username is None \
@@ -225,10 +223,9 @@ if __name__ == "__main__":
         # if there are no arguments, and there is no config file
         elif args.db is None and args.username is None and \
                 args.password is None and args.route is None: 
-                print 'Invalid arguments or configuration file, run with --help'
-                print 'Alternatively configure your config.json file.'
+                print('Invalid arguments or configuration file, run with --help')
+                print('Alternatively configure your config.json file.')
                 sys.exit(1)
-        print args
         db = MySQLdb.connect(host='sql',\
                              user = args.username,\
                              passwd = args.password,\

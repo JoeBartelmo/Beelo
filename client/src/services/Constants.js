@@ -1,4 +1,4 @@
-let host = 'http://flask:3000';
+let host = 'http://localhost';
 module.exports.Constants = {
     GET_COLORS: host + '/getColors',
     GET_DECKS: host + '/getDecks',

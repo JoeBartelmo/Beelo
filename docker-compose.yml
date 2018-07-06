@@ -19,10 +19,18 @@ services:
             MYSQL_USER: beelouser
             MYSQL_PASSWORD: password
             MYSQL_ROOT_PASSWORD: root
+        depends_on:
+            - sql
         ports:
             - 80:80
             - 8080:8080
             - 443:443
-            - 3000:3000
     client:
-
+        build: ./client
+        ports:
+            - 3000:3000
+        depends_on:
+            - flask
+            - sql
+volumes:
+      beelo-storage:

@@ -13,7 +13,7 @@ def refreshDatabase(db, imp):
         Updates all players in the database with new elo ratings
         @param imp - The elopy.Implementation from which to grab the players
         """
-        print 'refreshing database'
+        print('refreshing database')
         for player in imp.players:
                 db.cursor().execute("UPDATE elo "\
                             "SET rating="+str(player.rating)+" "\
@@ -26,7 +26,7 @@ def refreshImplementation(db, imp):
         implementation
         @param imp - The elopy.implementation from which to refresh the players
         """
-        print 'refreshing elopy'
+        print('refreshing elopy')
         cursor = db.cursor()
         imp.players = []
         cursor.execute("SELECT * FROM elo")
@@ -57,10 +57,10 @@ def getPlayer(db, name):
         '''
         db.cursor().execute('SELECT * FROM elo WHERE name=\'' + name +'\';')
         players = []
-	for player in cur.fetchall():
-		players.append({"name":player[0],"rating":float(player[1])})
+        for player in cur.fetchall():
+            players.append({"name":player[0],"rating":float(player[1])})
         if len(players) == 1:
-                return players[0]
+            return players[0]
         return None
 
 def addPlayersJson(db, jsonFile):
@@ -110,7 +110,7 @@ def addGame(db, p1, p2, d1, d2, c1, c2, winner):
                     "'" + c2.lower() + "',"
                     "'" + winner + "',"
                     "'" + time.strftime('%Y-%m-%d %H:%M:%S') + "');")
-            print sqlString
+            print(sqlString)
             cursor.execute(sqlString)
             db.commit()
 
@@ -145,7 +145,7 @@ def getGames(db, player, deck, colors):
                     sqlStr2 += 'colors2 = \'' + colors + '\''
 
             sqlstr = sqlStr1 + ') UNION ' + sqlStr2 + ');' 
-            print sqlstr
+            print(sqlstr)
             cursor.execute(sqlstr)
     else:
             cursor.execute('SELECT * FROM game;')

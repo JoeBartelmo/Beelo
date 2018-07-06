@@ -75,7 +75,7 @@ class Implementation:
         player2 = self.getPlayer(name2)
 
         if player1 is None or player2 is None:
-            print 'Player name is not included in this elo instance: ' + name1
+            print('Player name is not included in this elo instance: ' + name1)
             return
 
 
